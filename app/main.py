@@ -1,11 +1,20 @@
 
 from distutils.log import error
-from fastapi import FastAPI, Response, status, HTTPException
+import imp
+from fastapi import FastAPI, Response, status, HTTPException,Depends
 from fastapi.params import Body
 from pydantic import BaseModel
 import random
 import pyodbc
 import pandas as pd
+from . import models
+from . database import engine,get_db
+from sqlalchemy.orm import Session
+
+
+models.Base.metadata.create_all(bind=engine)
+
+
 
 app = FastAPI()
 
@@ -23,6 +32,13 @@ try:
 
 except error as err:
     print("err :",err)
+    
+    
+@app.get("/sql")
+
+def test(db: Session = Depends(get_db)):
+    posts=db.query(models.Post ).all()
+    return {"status":posts}
 
 @app.get("/")
 async def main():
