@@ -1,6 +1,7 @@
 
 from distutils.log import error
 import imp
+from unicodedata import name
 from fastapi import FastAPI, Response, status, HTTPException,Depends
 from fastapi.params import Body
 from pydantic import BaseModel
@@ -37,7 +38,7 @@ except error as err:
 @app.get("/sql")
 
 def test(db: Session = Depends(get_db)):
-    posts=db.query(models.Post ).all()
+    posts=db.query(models.TaskDB ).all()
     return {"status":posts}
 
 @app.get("/")
@@ -59,23 +60,14 @@ class Post(BaseModel):  # pydantic for schema
     published: bool = True
 
 
-my_posts = []
-
 
 @app.post("/posts", status_code=201)
-def home(post: Post): 
-    MY_TABLE="fast_info"       
-    query=f"INSERT INTO {MY_TABLE} VALUES (?,?,?)"
-    
-    values=(random.randint(1,10000),post.name,post.age)
-    
-    
-    cursor.execute(query,values)
-    
-    conn.commit()
-   
-
-    return {"data": my_posts}
+def home(post: Post,db: Session = Depends(get_db)):   
+    result=models.TaskDB(id=random.randint(1,10000),name=post.name,age=post.age)
+    db.add(result)
+    db.commit()
+    db.refresh(result)
+    return {"data": result}
 
 
 ######### get indidual post using id ###############
