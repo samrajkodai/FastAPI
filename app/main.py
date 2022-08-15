@@ -1,4 +1,5 @@
 
+from cgitb import reset
 from distutils.log import error
 import imp
 from unicodedata import name
@@ -35,21 +36,6 @@ except error as err:
     print("err :",err)
     
     
-@app.get("/sql")
-
-def test(db: Session = Depends(get_db)):
-    posts=db.query(models.TaskDB ).all()
-    return {"status":posts}
-
-@app.get("/")
-async def main():
-    return {"name": "samraj"}
-
-
-@app.get("/post")
-def home():
-    return {"data": my_posts}
-
 
 ######### POST METHOD ###############
 #####################################
@@ -57,13 +43,15 @@ def home():
 class Post(BaseModel):  # pydantic for schema
     name: str
     age: int
-    published: bool = True
+    # published: bool = True
 
 
 
 @app.post("/posts", status_code=201)
-def home(post: Post,db: Session = Depends(get_db)):   
-    result=models.TaskDB(id=random.randint(1,10000),name=post.name,age=post.age)
+def home(post: Post,db: Session = Depends(get_db)):  
+    print(post.dict()) 
+    result=models.TaskDB(**post.dict())
+    print(result)
     db.add(result)
     db.commit()
     db.refresh(result)
@@ -72,47 +60,12 @@ def home(post: Post,db: Session = Depends(get_db)):
 
 ######### get indidual post using id ###############
 ####################################################
-class FastAPI:
-    def __init__(self, id):
-        self.id = id
-
-    def find_post(self):
-        result = [i if i["id"] == self.id else "not found" for i in my_posts]
-        return result
-
-    def delete(self):
-        result = [my_posts.pop(
-            i) if p["id"] == self.id else "id not found" for i, p in enumerate(my_posts)]
-        return result
-
-
-class Update(FastAPI):
-    def __init__(self, id, post):
-        super().__init__(id)
-        self.post = post
-
-    def update(self):
-        result = [i.update(self.post) if i["id"] ==
-                  self.id else "id not found" for i in my_posts]
-        return result
-
 
 @app.get("/getpost/{id}")
-def getpost(id: int):
-    MY_TABLE="fast_info"
-    cursor.execute(f"select * from {MY_TABLE} where id={id}")
-    
-    res= None
-    for i in cursor:
-        # res=cursor.fetchone()
-        print(i[0])
-        print(i[1])
-        print(i[2])   
-        res=i[0],i[1],i[2]
-            
-    print((res))
-    conn.commit()
-    
+def getpost(id: int,db: Session = Depends(get_db)):
+    res=db.query(models.TaskDB ).filter(models.TaskDB.id==id).first()
+    print(res)
+         
     if not res:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="not found")
@@ -127,12 +80,15 @@ def getpost(id: int):
 
 
 @app.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete(id: int):
+def delete(id: int,db: Session = Depends(get_db)):
     
     try:
-        cursor.execute(f"Delete from {MY_TABLE} where id={id}")
+        post=db.query(models.TaskDB ).filter(models.TaskDB.id==id)
+        
+        post.delete()
     
-        conn.commit()
+        conn.commit() 
+        db.commit()
         
     except:
         
@@ -147,42 +103,25 @@ def delete(id: int):
 
 
 @app.put("/update/{id}")
-def update(id: int, post: Post):
+def update(id: int, post: Post,db: Session = Depends(get_db)):
     
     demo=str(post.name)
     print(demo)
     MY_TABLE="fast_info"
     try:
-        cursor.execute(f'''
-                UPDATE {MY_TABLE}
-                SET id = {id},
-                names='{demo}',
-                age={post.age}
-                WHERE id = {id}
-                ''')
-        
-        cursor.execute(f"select * from {MY_TABLE} where id={id}")
-        res= None
-        for i in cursor:
-            # res=cursor.fetchone()
-            print(i[0])
-            print(i[1])
-            print(i[2])   
-            res=i[0],i[1],i[2]
-    
-        conn.commit()
+        post_query=db.query(models.TaskDB ).filter(models.TaskDB.id==id)
+        post_query.update(post.dict())
+        db.commit()
         
         
         
     except pyodbc.Error  as err:
         
         print(err)
+        raise HTTPException(
+        status_code=status.HTTP_404_NOT_FOUND, detail="id not found")
 
-    if res==None:
-                raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="id not found")
-
-    return {"post": res}
+    return {"post": "res"}
 
 
 ######### Database Connetion ###############
