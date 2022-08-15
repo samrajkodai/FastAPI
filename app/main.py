@@ -132,6 +132,14 @@ def create_user(post: User,db: Session = Depends(get_db)):
     return createpost
 
 
+@app.get("/users/{id}")
 
+def get_user(id: int,db: Session = Depends(get_db)):
+    user=db.query(models.User).filter(models.User.id==id).first()
     
+    if user==None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,detail="details not found"
+        )
+    return user
     
