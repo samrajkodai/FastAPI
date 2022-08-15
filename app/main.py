@@ -1,3 +1,4 @@
+from os import stat
 from fastapi import FastAPI, Response, status, HTTPException,Depends
 from fastapi.params import Body
 import random
@@ -7,10 +8,13 @@ from . import models
 from . database import engine,get_db
 from sqlalchemy.orm import Session
 from . import schema
+from . utils import hash
 
 models.Base.metadata.create_all(bind=engine)
 
+
 Post=schema.Post
+User=schema.User
 
 app = FastAPI()
 
@@ -68,7 +72,6 @@ def delete(id: int,db: Session = Depends(get_db)):
         
         post.delete()
     
-        conn.commit() 
         db.commit()
         
     except:
@@ -105,5 +108,30 @@ def update(id: int, post: Post,db: Session = Depends(get_db)):
     return {"post": "res"}
 
 
-######### Database Connetion ###############
+######### User Registration ###############
 ############################################
+
+
+@app.post("/Create_User",status_code=status.HTTP_201_CREATED)
+
+def create_user(post: User,db: Session = Depends(get_db)):
+    password=post.password
+    password=hash(password)
+    post=post.dict()
+    post.update({"password":password})
+    createpost=models.User(**post)
+    print(createpost)
+    db.add(createpost)
+    db.commit()
+    db.refresh(createpost)
+    
+    if createpost==None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,detail="not created"
+        )
+    return createpost
+
+
+
+    
+    
