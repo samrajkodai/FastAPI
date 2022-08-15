@@ -1,49 +1,30 @@
-
-from cgitb import reset
-from distutils.log import error
-import imp
-from unicodedata import name
 from fastapi import FastAPI, Response, status, HTTPException,Depends
 from fastapi.params import Body
-from pydantic import BaseModel
 import random
 import pyodbc
 import pandas as pd
 from . import models
 from . database import engine,get_db
 from sqlalchemy.orm import Session
-
+from . import schema
 
 models.Base.metadata.create_all(bind=engine)
 
-
+Post=schema.Post
 
 app = FastAPI()
 
-try:
-        
-    conn = pyodbc.connect('Driver={SQL Server};'
-                        'Server=MSI\SQLEXPRESS;'
-                        'Database=Fastapi;'
-                        'Trusted_Connection=yes;')
-    
-    cursor = conn.cursor()
-    
-    MY_TABLE="fast_info"
+######### All Posts  ###############
+#####################################
 
+@app.get("/all")
 
-except error as err:
-    print("err :",err)
-    
-    
+def test(db: Session = Depends(get_db)):
+    posts=db.query(models.TaskDB ).all()
+    return posts
 
 ######### POST METHOD ###############
 #####################################
-
-class Post(BaseModel):  # pydantic for schema
-    name: str
-    age: int
-    # published: bool = True
 
 
 
