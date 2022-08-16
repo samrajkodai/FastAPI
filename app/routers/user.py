@@ -1,11 +1,13 @@
 
 from ctypes import util
+from os import access
 from .. import models,schema
 from fastapi import status, HTTPException,Depends,APIRouter
 from sqlalchemy.orm import Session
 from .. database import engine,get_db
 from .. import utils
 from .. utils import hash
+from .. import oauth
 
 User=schema.User
 Login=schema.Login
@@ -68,4 +70,6 @@ def login(login: Login,db: Session = Depends(get_db)):
             status_code=status.HTTP_404_NOT_FOUND,detail="invalid credentials"
         )
     
-    return {"token":"example token"}
+    access_token=oauth.create_access_token(data={"user_id":user.id})
+        
+    return {"token":access_token,'token_type':"bearer"}
