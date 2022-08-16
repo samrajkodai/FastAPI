@@ -5,12 +5,12 @@ from .. database import engine,get_db
 
 ######### POST METHOD ###############
 #####################################
-Router=APIRouter(prefix="/posts",tags=['posts'])
+Post_Router=APIRouter(prefix="/posts",tags=['posts'])
 
 
 Post=schema.Post
 
-@Router.post("/posts", status_code=201)
+@Post_Router.post("/posts", status_code=201)
 def home(post: Post,db: Session = Depends(get_db)):  
     print(post.dict()) 
     result=models.TaskDB(**post.dict())
@@ -24,7 +24,7 @@ def home(post: Post,db: Session = Depends(get_db)):
 ######### get indidual post using id ###############
 ####################################################
 
-@Router.get("/getpost/{id}")
+@Post_Router.get("/getpost/{id}")
 def getpost(id: int,db: Session = Depends(get_db)):
     res=db.query(models.TaskDB ).filter(models.TaskDB.id==id).first()
     print(res)
@@ -42,7 +42,7 @@ def getpost(id: int,db: Session = Depends(get_db)):
 #####################################
 
 
-@Router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@Post_Router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete(id: int,db: Session = Depends(get_db)):
     
     try:
@@ -64,7 +64,7 @@ def delete(id: int,db: Session = Depends(get_db)):
 #####################################
 
 
-@Router.put("/update/{id}")
+@Post_Router.put("/update/{id}")
 def update(id: int, post: Post,db: Session = Depends(get_db)):
     
     demo=str(post.name)

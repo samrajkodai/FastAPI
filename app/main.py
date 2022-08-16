@@ -8,15 +8,16 @@ from . import models
 from . database import engine,get_db
 from sqlalchemy.orm import Session
 from . import schema
-from . utils import hash
 from . routers import post,user
+
 
 models.Base.metadata.create_all(bind=engine)
 
 
 app = FastAPI()
-app.include_router(post.Router)
-app.include_router(user.Router)
+app.include_router(post.Post_Router)
+app.include_router(user.User_Router)
+
 
 ######### All Posts  ###############
 #####################################
@@ -24,7 +25,7 @@ app.include_router(user.Router)
 @app.get("/all")
 
 def test(db: Session = Depends(get_db)):
-    posts=db.query(models.TaskDB ).all()
+    posts=db.query(models.User ).all()
     return posts
 
 
