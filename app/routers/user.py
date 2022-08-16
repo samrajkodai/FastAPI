@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from .. database import engine,get_db
 
 User=schema.User
-Router=APIRouter()
+Router=APIRouter(prefix="/users",tags=['users'])
 
 ######### User Registration ###############
 ############################################

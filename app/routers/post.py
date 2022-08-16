@@ -5,7 +5,7 @@ from .. database import engine,get_db
 
 ######### POST METHOD ###############
 #####################################
-Router=APIRouter()
+Router=APIRouter(prefix="/posts",tags=['posts'])
 
 
 Post=schema.Post
