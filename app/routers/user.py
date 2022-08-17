@@ -8,9 +8,12 @@ from .. database import engine,get_db
 from .. import utils
 from .. utils import hash
 from .. import oauth
+from fastapi.security.oauth2 import OAuth2PasswordRequestForm,OAuth2PasswordBearer
 
 User=schema.User
 Login=schema.Login
+
+
 
 User_Router=APIRouter(prefix="/users",tags=['users'])
 
@@ -53,10 +56,12 @@ def get_user(id: int,db: Session = Depends(get_db)):
 @User_Router.post("/login")
 
 
-def login(login: Login,db: Session = Depends(get_db)):
-    user=db.query(models.User).filter(models.User.email==login.email).first()
+def login(login: OAuth2PasswordRequestForm=Depends(),db: Session = Depends(get_db)):
+    #OAuth2PasswordRequestForm
+    #password
+
+    user=db.query(models.User).filter(models.User.email==login.username).first()
     
-    print(user.password)
     
     if not user:
         raise HTTPException(
@@ -73,3 +78,5 @@ def login(login: Login,db: Session = Depends(get_db)):
     access_token=oauth.create_access_token(data={"user_id":user.id})
         
     return {"token":access_token,'token_type':"bearer"}
+
+

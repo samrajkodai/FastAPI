@@ -77,9 +77,7 @@ def update(id: int, post: Post,db: Session = Depends(get_db)):
         
         
         
-    except pyodbc.Error  as err:
-        
-        print(err)
+    except :
         raise HTTPException(
         status_code=status.HTTP_404_NOT_FOUND, detail="id not found")
 

@@ -1,4 +1,5 @@
 import email
+from typing import Optional
 from pydantic import BaseModel,EmailStr
 
 class Post(BaseModel):  # pydantic for schema
@@ -14,3 +15,6 @@ class User(BaseModel):  # pydantic for schema
 class Login(BaseModel):
     email: EmailStr
     password: str
+    
+class TokenData(BaseModel):
+    id: Optional[str]=None
