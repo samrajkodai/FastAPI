@@ -1,4 +1,4 @@
-from .. import models,schema,utils
+from .. import models,schema,utils,oauth
 from fastapi import FastAPI, Response, status, HTTPException,Depends,APIRouter
 from sqlalchemy.orm import Session
 from .. database import engine,get_db 
@@ -10,8 +10,11 @@ Post_Router=APIRouter(prefix="/posts",tags=['posts'])
 
 Post=schema.Post
 
+
+
 @Post_Router.post("/posts", status_code=201)
-def home(post: Post,db: Session = Depends(get_db)):  
+def home(post: Post,db: Session = Depends(get_db),user_id: int= Depends(oauth.get_current_user)):  
+    print(user_id)
     print(post.dict()) 
     result=models.TaskDB(**post.dict())
     print(result)
@@ -25,7 +28,7 @@ def home(post: Post,db: Session = Depends(get_db)):
 ####################################################
 
 @Post_Router.get("/getpost/{id}")
-def getpost(id: int,db: Session = Depends(get_db)):
+def getpost(id: int,db: Session = Depends(get_db),user_id: int= Depends(oauth.get_current_user)):
     res=db.query(models.TaskDB ).filter(models.TaskDB.id==id).first()
     print(res)
          
@@ -43,7 +46,7 @@ def getpost(id: int,db: Session = Depends(get_db)):
 
 
 @Post_Router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete(id: int,db: Session = Depends(get_db)):
+def delete(id: int,db: Session = Depends(get_db),user_id: int= Depends(oauth.get_current_user)):
     
     try:
         post=db.query(models.TaskDB ).filter(models.TaskDB.id==id)
@@ -65,7 +68,7 @@ def delete(id: int,db: Session = Depends(get_db)):
 
 
 @Post_Router.put("/update/{id}")
-def update(id: int, post: Post,db: Session = Depends(get_db)):
+def update(id: int, post: Post,db: Session = Depends(get_db),user_id: int= Depends(oauth.get_current_user)):
     
     demo=str(post.name)
     print(demo)

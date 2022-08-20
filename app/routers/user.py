@@ -1,6 +1,3 @@
-
-from ctypes import util
-from os import access
 from .. import models,schema
 from fastapi import status, HTTPException,Depends,APIRouter
 from sqlalchemy.orm import Session
@@ -55,7 +52,6 @@ def get_user(id: int,db: Session = Depends(get_db)):
 
 @User_Router.post("/login")
 
-
 def login(login: OAuth2PasswordRequestForm=Depends(),db: Session = Depends(get_db)):
     #OAuth2PasswordRequestForm
     #password
@@ -65,14 +61,14 @@ def login(login: OAuth2PasswordRequestForm=Depends(),db: Session = Depends(get_d
     
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,detail="invalid credentials"
+            status_code=status.HTTP_403_FORBIDDEN,detail="invalid credentials"
         )
     
     
         
     if not utils.verify(login.password,user.password):
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,detail="invalid credentials"
+            status_code=status.HTTP_403_FORBIDDEN,detail="invalid credentials"
         )
     
     access_token=oauth.create_access_token(data={"user_id":user.id})
