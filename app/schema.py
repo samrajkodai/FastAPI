@@ -5,6 +5,7 @@ from pydantic import BaseModel,EmailStr
 class Post(BaseModel):  # pydantic for schema
     name: str
     age: int
+    user_id: int
     # published: bool = True
 
 class User(BaseModel):  # pydantic for schema

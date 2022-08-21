@@ -13,8 +13,8 @@ Post=schema.Post
 
 
 @Post_Router.post("/posts", status_code=201)
-def home(post: Post,db: Session = Depends(get_db),user_id: int= Depends(oauth.get_current_user)):  
-    print(user_id)
+def home(post: Post,db: Session = Depends(get_db)):  
+    
     print(post.dict()) 
     result=models.TaskDB(**post.dict())
     print(result)
@@ -28,7 +28,7 @@ def home(post: Post,db: Session = Depends(get_db),user_id: int= Depends(oauth.ge
 ####################################################
 
 @Post_Router.get("/getpost/{id}")
-def getpost(id: int,db: Session = Depends(get_db),user_id: int= Depends(oauth.get_current_user)):
+def getpost(id: int,db: Session = Depends(get_db)):
     res=db.query(models.TaskDB ).filter(models.TaskDB.id==id).first()
     print(res)
          
@@ -49,11 +49,16 @@ def getpost(id: int,db: Session = Depends(get_db),user_id: int= Depends(oauth.ge
 def delete(id: int,db: Session = Depends(get_db),user_id: int= Depends(oauth.get_current_user)):
     
     try:
-        post=db.query(models.TaskDB ).filter(models.TaskDB.id==id)
+        if user_id==oauth.get_current_user.id:
+            post=db.query(models.TaskDB ).filter(models.TaskDB.id==id)
+            
+            post.delete()
         
-        post.delete()
-    
-        db.commit()
+            db.commit()
+            
+        else:
+            raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="not authorized to delete the post")
         
     except:
         
@@ -74,9 +79,15 @@ def update(id: int, post: Post,db: Session = Depends(get_db),user_id: int= Depen
     print(demo)
     MY_TABLE="fast_info"
     try:
-        post_query=db.query(models.TaskDB ).filter(models.TaskDB.id==id)
-        post_query.update(post.dict())
-        db.commit()
+        if user_id==oauth.get_current_user.id:
+            post_query=db.query(models.TaskDB ).filter(models.TaskDB.id==id)
+            post_query.update(post.dict())
+            db.commit()
+            
+        else:
+            raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN, detail="not authorized to delete the post")
+       
         
         
         
