@@ -1,18 +1,19 @@
-from .. import models,schema,utils,oauth
-from fastapi import FastAPI, Response, status, HTTPException,Depends,APIRouter
+from .. import models,schema,oauth
+from fastapi import Response, status, HTTPException,Depends,APIRouter
 from sqlalchemy.orm import Session
-from .. database import engine,get_db 
+from .. database import get_db 
 
 ######### POST METHOD ###############
 #####################################
-Post_Router=APIRouter(prefix="/posts",tags=['posts'])
+router=APIRouter(prefix="/posts",tags=['posts'])
 
 
 Post=schema.Post
 
 
 
-@Post_Router.post("/posts", status_code=201)
+
+@router.post("/posts", status_code=201)
 def home(post: Post,db: Session = Depends(get_db)):  
     
     print(post.dict()) 
@@ -27,7 +28,7 @@ def home(post: Post,db: Session = Depends(get_db)):
 ######### get indidual post using id ###############
 ####################################################
 
-@Post_Router.get("/getpost/{id}")
+@router.get("/getpost/{id}")
 def getpost(id: int,db: Session = Depends(get_db)):
     res=db.query(models.TaskDB ).filter(models.TaskDB.id==id).first()
     print(res)
@@ -45,7 +46,7 @@ def getpost(id: int,db: Session = Depends(get_db)):
 #####################################
 
 
-@Post_Router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/delete/{id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete(id: int,db: Session = Depends(get_db),user_id: int= Depends(oauth.get_current_user)):
     
     try:
@@ -72,7 +73,7 @@ def delete(id: int,db: Session = Depends(get_db),user_id: int= Depends(oauth.get
 #####################################
 
 
-@Post_Router.put("/update/{id}")
+@router.put("/update/{id}")
 def update(id: int, post: Post,db: Session = Depends(get_db),user_id: int= Depends(oauth.get_current_user)):
     
     demo=str(post.name)
