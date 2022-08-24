@@ -17,3 +17,12 @@ class User(Base):
     id=Column(Integer,primary_key=True)
     email=Column(String)
     password=Column(String)
+    
+    
+class Votes(Base):
+    __tablename__="votes"
+    
+    user_id=Column(Integer,ForeignKey("User_Info.id"),primary_key=True)
+    post_id=Column(Integer,ForeignKey("posts.id"),primary_key=True)
+    
+    

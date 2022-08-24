@@ -1,6 +1,7 @@
 import email
 from typing import Optional
 from pydantic import BaseModel,EmailStr
+from pydantic.types import conint
 
 class Post(BaseModel):  # pydantic for schema
     name: str
@@ -19,3 +20,7 @@ class Login(BaseModel):
     
 class TokenData(BaseModel):
     id: Optional[str]=None
+    
+class Vote(BaseModel):
+    post_id: int
+    dir:conint(le=1)
