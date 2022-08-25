@@ -32,3 +32,4 @@ toml==0.10.2
 typing_extensions==4.3.0
 uvicorn==0.18.2
 sqlalchemy
+psycopg2
