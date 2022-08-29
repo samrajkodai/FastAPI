@@ -5,8 +5,7 @@
 
 [![Build Status](https://travis-ci.org/joemccann/dillinger.svg?branch=master)](https://travis-ci.org/joemccann/dillinger)
 
-The Django REST framework (DRF) is a toolkit built on top of the Django web framework that reduces the amount of code you need to write to create REST interfaces.
-
+FastAPI is a Python framework and set of tools that enables developers to use a REST interface to call commonly used functions to implement applications
 
 ## project structure
         + app/
