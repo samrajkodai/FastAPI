@@ -1,4 +1,4 @@
-# FastAPI
+# FastAPI.
 
 
 ![N|Solid](https://user-images.githubusercontent.com/61903698/187243163-4771c270-dc29-4642-9e3e-cd1043c9abaf.png)
